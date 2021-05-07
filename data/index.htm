@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Activity Detector Control</title>
+   <link href='main.css' rel='stylesheet' type='text/css'>
+   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+   <link rel="icon" type="image/png" sizes="144x144"  href="./favicon_dmx_144x144.png">
+   <link rel="icon" type="image/png" sizes="48x48" href="./favicon_dmx_44x44.ico">
+   <link rel="manifest" href="/manifest.json">
+   <meta name="theme-color" content="#00878f">
+   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+   <script src="WebSocket.js" type="text/javascript"></script>
+   <script type="text/javascript">
+      var myAjax = false;
+      window.onload = start;
+   </script>
+</head>
+
+<body>
+    <center>
+        <header>
+            <h1>DMX-Control MegaTriparPlus</h1>
+        </header>
+        <div>
+            <table style="table-layout: fixed; width: 100%;">
+                <tr id="Tableheading">
+                   <th style="width: 10%; text-align: left">Chan.</th>
+                   <th style="width: 32%; text-align: left"></th>
+                   <th style="width: 24%; text-align: left">Setting</th>
+                   <th style="width: 24%; text-align: right"></th>
+                   <th style="width: 10%; text-align: right">Cur</th>
+                </tr>
+                <tr id="Kanalmodus">
+                    <td style="text-align: left"></td>
+                    <td style="text-align: left">Kanal-Moduls</td>
+                    <td colspan="2"; style="align: left">
+						<select name="numChanSet" onchange="setChannelMode(this.value);" onfocus="this.selectedIndex = -1;">
+							<option value="4">4: Farbauswahl</option>
+							<option value="5">5: Farbauswahl + Dimmer</option>
+							<option value="6">6: Farbauswahl + Dimmer + Stobe</option>
+							<option value="9">9: Stg. Komplett w/ Dimmerkurve</option>
+							<option  selected="selected" value="10">10: Stg. Komplett w/o Dimmerkurve</option>
+						</select>
+					</td>
+                    <td style="text-align: right"><span id="numChanCur">0</span></td>
+                </tr>  
+				<tr  id="ch1tableRow">
+                    <td id="ch1td" style="text-align: left">0</td>
+                    <td style="text-align: left">Lvl. Rot</td>
+                    <td style=""><input class="enabled" id="ch1Slider" type="range" min="0" max="255" step="1" oninput="setSliderVal(this.value, 'ch1Set');" onchange="submitVal('ch1Set','ch1Slider');" value="0"></td>
+                    <td style="text-align: right">
+						<input type="number" id="ch1Set" type="range" min="0" max="255" step="1">
+						<button id="ch1Submit" value="Submit" onclick="submitVal('ch1Set','ch1Slider');">&#x23CE;</button>
+					</td>
+                    <td style="text-align: right"><span id="ch1cur">0</span></td>
+                </tr>
+                <tr  id="ch2tableRow">
+                    <td id="ch2td" style="text-align: left">1</td>
+                    <td style="text-align: left">Lvl. Grün</td>
+                    <td style=""><input class="enabled" id="ch2Slider" type="range" min="0" max="255" step="1" oninput="setSliderVal(this.value, 'ch2Set');" onchange="submitVal('ch2Set','ch2Slider');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="ch2Set" type="range" min="0" max="255" step="1">
+						<button id="ch2Submit" value="Submit" onclick="submitVal('ch2Set','ch2Slider');">&#x23CE;</button>
+					</td>
+                    <td style="text-align: right"><span id="ch2cur">0</span></td>
+                </tr>
+                <tr id="ch3tableRow">
+                    <td id="ch3td" style="text-align: left">2</td>
+                    <td style="text-align: left">Lvl. Blau</td>
+                    <td style=""><input class="enabled" id="ch3Slider" type="range" min="0" max="255" step="1" oninput="setSliderVal(this.value, 'ch3Set');" onchange="submitVal('ch3Set','ch3Slider');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="ch3Set" type="range" min="0" max="255" step="1">
+						<button id="ch3Submit" value="Submit" onclick="submitVal('ch3Set','ch3Slider');">&#x23CE;</button>
+					</td>
+                    <td style="text-align: right"><span id="ch3cur">0</span></td>
+                </tr>
+                <tr id="ch4tableRow">
+                    <td id="ch4td" style="text-align: left">3</td>
+                    <td style="text-align: left">Lvl. UV</td>
+                    <td style=""><input class="enabled" id="ch4Slider" type="range" min="0" max="255" step="1" oninput="setSliderVal(this.value, 'ch4Set');" onchange="submitVal('ch4Set','ch4Slider');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="ch4Set" type="range" min="0" max="255" step="1">
+						<button id="ch4Submit" value="Submit" onclick="submitVal('ch4Set','ch4Slider');">&#x23CE;</button>
+					</td>
+                    <td style="text-align: right"><span id="ch4cur">0</span></td>
+                </tr>
+                <tr id="ch5_strobe_tableRow">
+                    <td id="ch5_1td" style="text-align: left">4</td>
+                    <td style="text-align: left">Strobe-Speed/Ein/Aus</td>
+                    <td style="align: left">
+						<select id="strobeModeSet" name="strobeModeSet" onchange="setStrobe(this.value);" onfocus="this.selectedIndex = -1;">
+							<option value="0">0: LED Aus</option>
+							<option value="64">64: Strobe Speed</option>
+							<option value="128">128: Strobe Puls Speed</option>
+							<option value="192">192: Rand. Strobe Speed</option>
+							<option value="255">255: LED Ein</option>
+						</select></td>
+                    <td style="text-align: right">
+						<input type="number" id="strobeSpeedSet" min="0" max="31">
+						<button id="strobeSpeedSetSubmit" value="Submit" onclick="submitVal('strobeSpeedSet','');">&#x23CE;</button>
+					</td>
+                    <td style="text-align: right"><span id="ch5_1cur">0</span></td>
+                </tr>
+                <tr id="ch5_dimmer_tableRow">
+                    <td id="ch5_2td" style="text-align: left">4</td>
+                    <td style="text-align: left">Master-Dimmer</td>
+                    <td style=""><input class="enabled" id="ch5Slider" type="range" min="0" max="255" step="1" oninput="setSliderVal(this.value, 'ch5_dimmer_valEdit');" onchange="submitVal('ch5_dimmer_valEdit','ch5Slider');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="ch5_dimmer_valEdit" type="range" min="0" max="255" step="1">
+						<button id="ch5_dimmer_valSubmit" value="Submit" onclick="submitVal('ch5_dimmer_valEdit','ch5Slider');">&#x23CE;</button>
+					</td>
+                    <td style="text-align: right"><span id="ch5_2cur">0</span></td>
+                </tr>
+                <tr id="ch6tableRow">
+                    <td id="ch6td" style="text-align: left">5</td>
+                    <td style="text-align: left">Master-Dimmer</td>
+                    <td style=""><input class="enabled" id="ch6Slider" type="range" min="0" max="255" step="1" oninput="setSliderVal(this.value, 'ch6Edit');" onchange="submitVal('ch6Edit','ch6Slider');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="ch6Edit" type="range" min="0" max="255" step="1">
+						<button id="ch6Submit" value="Submit" onclick="submitVal('ch6Edit','ch6Slider');">&#x23CE;</button>
+					</td>
+                    <td style="text-align: right"><span id="ch6cur">0</span></td>
+                </tr>
+                <tr id="ch7tableRow">
+                    <td id="ch7td" style="text-align: left">6</td>
+                    <td style="text-align: left">Modus-Auswahl</td>
+                    <td colspan="2"; style="align: left">
+						<select id="progModeSet" name="progModeSet" onchange="setMode(this.value);" onfocus="this.selectedIndex = -1;">
+							<option value="25">25: Dimmer-Modus</option>
+							<option value="75">75: Farbton-Modus</option>
+							<option value="125">125: Farbwechsel-Modus</option>
+							<option value="175">175: Farb-Fade-Modus</option>
+							<option value="225">225: Musiksteuerungs-Modus</option>
+						</select></td>
+                    <td style="text-align: right"><span id="ch7cur">0</span></td>
+                </tr>
+                <tr id="ch8_farbmakro_tableRow">
+                    <td id="ch8_1td" style="text-align: left">7</td>
+                    <td style="text-align: left">Farbtonauswahl</td>
+                    <td style=""><input class="enabled" id="ch8slider_farbmakro" type="range" min="0" max="255" step="1" oninput="setSliderVal(this.value, 'farbtonSetInput');" onchange="submitVal('farbtonSetInput','ch8slider_farbmakro');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="farbtonSetInput" type="range" min="0" max="255" step="1">
+						<button id="farbtonSetSubmit" value="Submit" onclick="submitVal('farbtonSetInput','ch8slider_farbmakro');">&#x23CE;</button></td>
+                    <td style="text-align: right"><span id="ch8_1cur">0</span></td>
+                </tr>
+                <tr id="ch8_progSel_tableRow">
+                    <td id="ch8_2td" style="text-align: left">7</td>
+                    <td style="text-align: left">Musik-/Progammauswahl</td>
+                    <td style=""><input class="enabled" id="ch8slider_progSel" type="range" min="0" max="15" step="1" oninput="setSliderVal(this.value, 'progSelSetInput');" onchange="submitVal('progSelSetInput','ch8slider_progSel');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="progSelSetInput" type="range" min="0" max="15" step="1">
+						<button id="progSelSetSubmit" value="Submit" onclick="submitVal('progSelSetInput','ch8slider_progSel');">&#x23CE;</button></td>
+                    <td style="text-align: right"><span id="ch8_2cur">0</span></td>
+                </tr>
+                <tr id="ch9tableRow">
+                    <td id="ch9td" style="text-align: left">8</td>
+                    <td style="text-align: left">Prog-Speed/Musik-Sens.</td>
+                    <td style=""><input class="enabled" id="ch9slider" type="range" min="0" max="255" step="1" oninput="setSliderVal(this.value, 'speedSenseSetInput');" onchange="submitVal('speedSenseSetInput','ch9slider');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="speedSenseSetInput" type="range" min="0" max="255" step="1">
+						<button id="speedSenseSetSubmit" value="Submit" onclick="submitVal('speedSenseSetInput','ch9slider');">&#x23CE;</button>
+                    <td style="text-align: right"><span id="ch9cur">0</span></td>
+                </tr>
+                <tr id="ch10tableRow">
+                    <td id="ch10td" style="text-align: left">9</td>
+                    <td style="text-align: left">Dimmerkurve</td>
+                    <td colspan="2"; style="align: left">
+						<select id="dimCurveSet" name="dimCurveSet" onchange="setDimmerkurve(this.value);" onfocus="this.selectedIndex = -1;">
+							<option value="10">10: Standard</option>
+							<option value="30">30: Bühne</option>
+							<option value="50">50: TV</option>
+							<option value="70">70: Architektur</option>
+							<option value="90">90: Kino/Theater
+							<option value="200">200: Std. auf Gerät</option>
+						</select>
+					</td>
+                    <td style="text-align: right"><span id="ch10cur">0</span></td>
+                </tr><tr></tr>
+                <tr>
+                    <td style="text-align: left"></td>
+                    <td style="text-align: left">Universe [0...511]</td>
+                    <td style=""><input class="enabled" id="univSelSlider" type="range" min="0" max="511" step="1" oninput="setSliderVal(this.value, 'universeInput');" onchange="submitVal('universeInput','univSelSlider');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="universeInput" type="range" min="0" max="511" step="1">
+						<button id="univSubmit" value="Submit" onclick="submitVal('universeInput','univSelSlider');">&#x23CE;</button></td>
+                    <td style="text-align: right"><span id="univCur">0</span></td>
+                </tr><tr></tr>
+                <tr>
+                    <td style="text-align: left"></td>
+                    <td style="text-align: left">Start-Adresse[0...511]</td>
+                    <td style=""><input class="enabled" id="addrSelSlider" type="range" min="0" max="511" step="1" oninput="setSliderVal(this.value, 'addrInput');" onchange="submitVal('addrInput','addrSelSlider');" value="0">
+                    <td style="text-align: right">
+						<input type="number" id="addrInput" type="range" min="0" max="511" step="1">
+						<button id="addrSubmit" value="Submit" onclick="submitVal('addrInput','addrSelSlider');">&#x23CE;</button></td>
+                    <td style="text-align: right"><span id="addrCur">0</span></td>
+                </tr><tr></tr>
+            </table>
+			<p style="margin:8px 0px"><button id="Prog" class="button" style="background-color:#00878F" onclick="setMode('PROG');">Program</button>
+			<button id="SAVE_ALL" class="button" style="background-color:#00878F" onclick="saveAll();">Safe</button>
+			<button id="Prog" class="button" style="background-color:#00878F" onclick="loadDefaultsWeb();">WebDefault</button>
+			<button id="Prog" class="button" style="background-color:#00878F" onclick="location.href='fhemConfig.html'">Config</button>
+        </div>
+    </center>
+</body>
+</html>

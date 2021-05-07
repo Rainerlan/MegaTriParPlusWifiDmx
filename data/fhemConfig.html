@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Activity Detector Control</title>
+   <link href='main.css' rel='stylesheet' type='text/css'>
+   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+   <link rel="icon" type="image/png" sizes="144x144"  href="/favicon-144x144.png">
+   <link rel="icon" type="image/png" sizes="48x48" href="/favicon.ico">
+   <link rel="manifest" href="/manifest.json">
+   <meta name="theme-color" content="#00878f">
+   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+   <script src="WebSocket2.js" type="text/javascript"></script>
+   <script type="text/javascript">
+      var myAjax = false;
+      window.onload = start;
+   </script>
+</head>
+
+<body>
+    <center>
+        <header>
+            <h1>Activity Detector Control</h1>
+        </header>
+        <div>
+            <table>
+                <tr>
+                   <th colspan="2" style="text-align: left">Fhem Settings</th> 
+                </tr>
+                <tr>
+                    <td style="width:150Px; text-align: right">Fhem sever IP</td>
+                    <td style="width:250Px"><input class="enabled" id="server" type="text" minlength="7" maxlength="15" pattern="^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$" name="fhemServerIP"></td>
+                </tr>
+                <tr>
+                    <td style="width:150Px; text-align: right">Fhem sever port</td>
+                    <td style="width:250Px"><input class="enabled" id="port" type="number" name="fhemServerPort"></td>
+                </tr>
+                <tr>
+                    <td style="width:150Px; text-align: right">Fhem device name</td>
+                    <td style="width:250Px"><input class="enabled" id="device" type="text" name="fhemDeviceName"></td>
+                </tr>
+                <tr>
+                    <td style="width:150Px; text-align: right">Fhem device reading</td>
+                    <td style="width:250Px"><input class="enabled" id="reading" type="text" name="fhemDeviceReading"></td>
+                </tr>
+            </table>
+            <p style="margin:8px 0px"><button id="SAVE_ALL" class="button" style="background-color:#00878F" onclick="sendVal();">Save settings</button>  <button id="INDEX_HTML" class="button" style="background-color:#00878F" onClick="location.href='index.htm'">Main page</button></p>
+        </div>
+    </center>
+</body>
+</html>
