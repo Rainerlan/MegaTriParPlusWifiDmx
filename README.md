@@ -1,4 +1,4 @@
-# MegaTriParPlusWifiDmx
+# Mega TriPar Profile Plus Wifi Dmx
 Adds a Wifi web frontend via ESP32 to an ADJ Mega Tripar Profile Plus (through DMX)
 
 Any ESP32 with an 0.96 inch OLED display may be used to run this code.
